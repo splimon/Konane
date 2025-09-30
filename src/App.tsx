@@ -45,9 +45,9 @@ function App() {
         
         <div className="mt-8 text-center">
           <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-800 mb-4">About Konane</h2>
+            <h2 className="text-2xl font-bold text-slate-800 mb-4">About Kokane</h2>
             <p className="text-slate-600 leading-relaxed">
-              Konane is a traditional Hawaiian strategy game similar to checkers. The game was historically 
+              Kokane is a traditional Hawaiian strategy game similar to checkers. The game was historically 
               played by Hawaiian royalty and commoners alike. Players must jump over opponent pieces to 
               capture them, with the goal of being the last player able to make a move. The game requires 
               strategic thinking and planning, as players must consider both offensive captures and 

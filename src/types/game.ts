@@ -16,3 +16,6 @@ export interface Move {
 }
 
 export type GameState = 'initializing' | 'playing' | 'finished';
+// 'initializing' = players are removing starting pieces
+// 'playing'      = normal gameplay is ongoing
+// 'finished'     = the game is over, a winner is determined

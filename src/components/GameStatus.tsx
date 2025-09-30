@@ -12,37 +12,39 @@ interface GameStatusProps {
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
-  gameState,
-  currentPlayer,
-  moveCount,
-  onReset,
-  winner,
-  isInitializing
+  gameState,      // current game state: "playing", "over", etc.
+  currentPlayer,  // whose turn it is: "black" or "white"
+  moveCount,      // total moves made so far
+  onReset,        // callback when "New Game" button is clicked
+  winner,         // stores the winner if the game is over
+  isInitializing  // flag: true when setting up the board
 }) => {
+  // Returns a message to display based on the state of the game
   const getStatusMessage = (): string => {
     if (winner) {
-      return `${winner === 'black' ? 'Black' : 'White'} Wins!`;
+      return `${winner === 'black' ? 'Black' : 'White'} Wins!`; // show winner
     }
     if (isInitializing) {
-      return 'Remove two adjacent pieces from the center to begin';
+      return 'Remove two adjacent pieces to begin'; // setup instructions
     }
     if (gameState === 'playing') {
-      return `${currentPlayer === 'black' ? 'Black' : 'White'}'s Turn`;
+      return `${currentPlayer === 'black' ? 'Black' : 'White'}'s Turn`; // turn info
     }
-    return 'Game Over';
+    return 'Game Over'; // game over
   };
 
+  // Returns status color based on game state
   const getStatusColor = (): string => {
-    if (winner) return 'text-emerald-600';
-    if (isInitializing) return 'text-blue-600';
-    return currentPlayer === 'black' ? 'text-slate-700' : 'text-amber-600';
+    if (winner) return 'text-emerald-600';    // green for winner
+    if (isInitializing) return 'text-blue-600';   // blue for setup
+    return currentPlayer === 'black' ? 'text-slate-700' : 'text-amber-600';   // player turn color
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 min-w-80">
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold text-slate-800 mb-2 font-serif">
-          Konane
+          Kokane
         </h1>
         <p className="text-slate-600 text-sm">Hawaiian Checkers</p>
       </div>
@@ -64,7 +66,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         {isInitializing && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-blue-800 text-sm text-center">
-              Click on two adjacent pieces near the center of the board to remove them and start the game.
+              Click on two adjacent pieces to remove them from the board and start the game.
             </p>
           </div>
         )}

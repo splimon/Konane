@@ -4,15 +4,16 @@ import { GamePiece, Position, PieceColor, GameState, Move } from '../types/game'
 const BOARD_SIZE = 8;
 
 export const useKonaneGame = () => {
-  const [board, setBoard] = useState<(GamePiece | null)[][]>(() => initializeBoard());
-  const [currentPlayer, setCurrentPlayer] = useState<PieceColor>('black');
-  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-  const [gameState, setGameState] = useState<GameState>('initializing');
-  const [winner, setWinner] = useState<PieceColor | null>(null);
-  const [moveCount, setMoveCount] = useState<number>(0);
-  const [removedPieces, setRemovedPieces] = useState<number>(0);
-  const [moveHistory, setMoveHistory] = useState<Move[]>([]);
+  const [board, setBoard] = useState<(GamePiece | null)[][]>(() => initializeBoard());  // 2d board array
+  const [currentPlayer, setCurrentPlayer] = useState<PieceColor>('black');              // Whose turn
+  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);      // Currently selected piece
+  const [gameState, setGameState] = useState<GameState>('initializing');                // "initializing" | "playing" | "finished"
+  const [winner, setWinner] = useState<PieceColor | null>(null);                        // Who won
+  const [moveCount, setMoveCount] = useState<number>(0);                                // number of moves made
+  const [removedPieces, setRemovedPieces] = useState<number>(0);                        // tracks removed pieces at start
+  const [moveHistory, setMoveHistory] = useState<Move[]>([]); 
 
+  // Initialize checker pattern of black/white board pieces
   function initializeBoard(): (GamePiece | null)[][] {
     const newBoard: (GamePiece | null)[][] = [];
     for (let row = 0; row < BOARD_SIZE; row++) {
@@ -28,16 +29,25 @@ export const useKonaneGame = () => {
     return newBoard;
   }
 
-  const getValidMoves = useCallback((position: Position, boardState: (GamePiece | null)[][], playerColor: PieceColor): Position[] => {
+  // CHANGED: Added forcedDirection parameter
+  // Get valid moves for a single piece
+  const getValidMoves = useCallback((
+    position: Position, 
+    boardState: (GamePiece | null)[][], 
+    playerColor: PieceColor,
+    forcedDirection?: [number, number] // CHANGED
+  ): Position[] => {
     if (gameState === 'initializing') return [];
     
     const { row, col } = position;
     const piece = boardState[row][col];
     
+    // Must be player's own piece
     if (!piece || piece.color !== playerColor) return [];
     
     const validMoves: Position[] = [];
-    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]]; // up, down, left, right
+    // CHANGED: If we are mid-jump, only check the same direction
+    const directions = forcedDirection ? [forcedDirection] : [[-1, 0], [1, 0], [0, -1], [0, 1]]; // up, down, left, right
     
     for (const [dRow, dCol] of directions) {
       const jumpOverRow = row + dRow;
@@ -45,7 +55,7 @@ export const useKonaneGame = () => {
       const landRow = row + (dRow * 2);
       const landCol = col + (dCol * 2);
       
-      // Check bounds
+      // Check bounds (Must land inside the board)
       if (landRow < 0 || landRow >= BOARD_SIZE || landCol < 0 || landCol >= BOARD_SIZE) continue;
       
       // Check if there's an opponent piece to jump over
@@ -61,6 +71,7 @@ export const useKonaneGame = () => {
     return validMoves;
   }, [gameState]);
 
+  // Get all valid moves for the current player
   const getAllValidMovesForPlayer = useCallback((playerColor: PieceColor, boardState: (GamePiece | null)[][]): Position[] => {
     const allMoves: Position[] = [];
     
@@ -77,7 +88,9 @@ export const useKonaneGame = () => {
     return allMoves;
   }, [getValidMoves]);
 
-  const executeMove = useCallback((from: Position, to: Position) => {
+  // CHANGED: Added direction parameter
+  // Execute a move: move piece, capture, switch player if no more jumps
+  const executeMove = useCallback((from: Position, to: Position, direction?: [number, number]) => {
     setBoard(prevBoard => {
       const newBoard = prevBoard.map(row => [...row]);
       const piece = newBoard[from.row][from.col];
@@ -95,9 +108,12 @@ export const useKonaneGame = () => {
       const capturedCol = from.col + dCol;
       
       newBoard[capturedRow][capturedCol] = null;
+
+      // CHANGED: If this is the first jump, set the direction now
+      const moveDirection: [number, number] = direction ?? [dRow, dCol];
       
-      // Check for additional jumps from new position
-      const additionalMoves = getValidMoves(to, newBoard, piece.color);
+      // CHANGED: Only look for further moves in the same direction
+      const additionalMoves = getValidMoves(to, newBoard, piece.color, moveDirection);
       
       if (additionalMoves.length === 0) {
         // No more jumps available, switch players
@@ -123,12 +139,13 @@ export const useKonaneGame = () => {
       const piece = board[row][col];
       if (!piece) return;
       
+      // CHANGED: REMOVED THIS BLOCK OF CODE
       // Check if this is near the center and adjacent to another removed piece or first removal
-      const centerRow = Math.floor(BOARD_SIZE / 2);
-      const centerCol = Math.floor(BOARD_SIZE / 2);
-      const distanceFromCenter = Math.abs(row - centerRow) + Math.abs(col - centerCol);
+      // const centerRow = Math.floor(BOARD_SIZE / 2);
+      // const centerCol = Math.floor(BOARD_SIZE / 2);
+      //  const distanceFromCenter = Math.abs(row - centerRow) + Math.abs(col - centerCol);
       
-      if (distanceFromCenter > 2) return; // Too far from center
+      // if (distanceFromCenter > 2) return; // Too far from center
       
       setBoard(prevBoard => {
         const newBoard = prevBoard.map(r => [...r]);
@@ -136,10 +153,32 @@ export const useKonaneGame = () => {
         return newBoard;
       });
       
+      // CHANGED: ADDED THIS BLOCK OF CODE
       setRemovedPieces(prev => {
         const newCount = prev + 1;
-        if (newCount === 2) {
+        // store first removed position
+        if (newCount === 1) {
+          setSelectedPosition({ row, col });
+        } else if (newCount === 2) {
+          // check adjacency to the first removed piece
+          if (selectedPosition) {
+            const isAdjacent =
+              (Math.abs(row - selectedPosition.row) === 1 && col === selectedPosition.col) ||
+              (Math.abs(col - selectedPosition.col) === 1 && row === selectedPosition.row);
+
+            if (!isAdjacent) {
+              // invalid second removal → undo it
+              setBoard(prevBoard => {
+                const newBoard = prevBoard.map(r => [...r]);
+                newBoard[row][col] = { color: piece.color }; // restore piece
+                return newBoard;
+              });
+              return prev; // don’t count it
+            }
+          }
+          // valid, then start the game
           setGameState('playing');
+          setSelectedPosition(null);
         }
         return newCount;
       });

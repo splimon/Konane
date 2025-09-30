@@ -2,23 +2,25 @@ import React from 'react';
 import { PieceColor } from '../types/game';
 
 interface PieceProps {
-  color: PieceColor;
-  isSelected: boolean;
-  canMove: boolean;
+  color: PieceColor;    // black or white piece
+  isSelected: boolean;  // whether this piece is currently selected
+  canMove: boolean;     // whether this piece can be moved
 }
 
 const Piece: React.FC<PieceProps> = ({ color, isSelected, canMove }) => {
+  // Base styling applied to all pieces
   const baseClass = "w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full transition-all duration-300 cursor-pointer shadow-lg";
   
+  // Styling depending on piece color
   const colorClass = color === 'black' 
-    ? "bg-slate-800 border-2 border-slate-900" 
-    : "bg-amber-50 border-2 border-amber-200";
+    ? "bg-slate-800 border-2 border-slate-900"  // dark piece with darker border
+    : "bg-amber-50 border-2 border-amber-200";  // light piece with lighter border
   
   const stateClass = isSelected 
-    ? "transform scale-110 shadow-xl" 
+    ? "transform scale-110 shadow-xl"    // selected piece is larger + stronger shadow
     : canMove 
-      ? "hover:transform hover:scale-105 hover:shadow-xl" 
-      : "hover:transform hover:scale-105";
+      ? "hover:transform hover:scale-105 hover:shadow-xl" // movable piece enlarges on hover
+      : "hover:transform hover:scale-105";  // otherwise just hover enlarges slightly
 
   return (
     <div className={`${baseClass} ${colorClass} ${stateClass}`}>
