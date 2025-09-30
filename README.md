@@ -27,5 +27,5 @@ I modified the generated code to fix these problems, ensuring the game follows t
 - Responsive UI with interactive game board and status display  
 
 ---
-
+This project was deployed using Vercel, and can be accessed [here](https://kokane-pg26ou8qd-samantha-limons-projects.vercel.app/).
 Enjoy playing Kokane!
