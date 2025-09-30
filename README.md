@@ -1,6 +1,6 @@
-# Kokane 🌺
+# Konane 🌺
 
-**Kokane** is a traditional Hawaiian strategy game similar to checkers. Each player is assigned either a white or black piece. The player with the black piece starts by removing any piece from the board (usually from the center or a corner). Players then take turns jumping over their opponent's pieces to capture them. The game ends when a player can no longer make a move.
+**Konane** is a traditional Hawaiian strategy game similar to checkers. Each player is assigned either a white or black piece. The player with the black piece starts by removing any piece from the board (usually from the center or a corner). Players then take turns jumping over their opponent's pieces to capture them. The game ends when a player can no longer make a move.
 
 ---
 
@@ -29,4 +29,4 @@ I modified the generated code to fix these problems, ensuring the game follows t
 ---
 This project was deployed using Vercel, and can be accessed [here](https://kokane.vercel.app/).
 
-Enjoy playing Kokane!
+Enjoy playing Konane!

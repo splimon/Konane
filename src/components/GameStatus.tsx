@@ -44,7 +44,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
     <div className="bg-white rounded-xl shadow-lg p-6 min-w-80">
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold text-slate-800 mb-2 font-serif">
-          Kokane
+          Konane
         </h1>
         <p className="text-slate-600 text-sm">Hawaiian Checkers</p>
       </div>
